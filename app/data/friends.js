@@ -1,4 +1,4 @@
-var friendArray = [
+var friendsArray = [
 	{
 		name: 'Freedie Prinze Jr',
 		photo: 'https://dd2d9j2i66w9u.cloudfront.net/wp-content/uploads/sites/2/2018/09/25003840/Freddie-Prinze-Jr-Shea-Serrano-Twitter.jpg',
@@ -160,3 +160,6 @@ var friendArray = [
 		]
 	}
 ];
+
+
+module.exports = friendsArray;

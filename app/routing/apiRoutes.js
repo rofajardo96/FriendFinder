@@ -1,44 +1,54 @@
-// Handles incoming survey results and the logic determining compatibility
-//Load Data
-var friendArray = require('../data/friends.js');
+// Pull required dependencies
+var path = require('path');
 
-module.exports = function(app){
-  // displays JSON 
-  app.get('/api/friends', function(req,res){
-    res.json(friendArray);
-  });
+// Import list of friend entries
+var friends = require('../data/friends.js');
 
-  app.post('/api/friends', function(req,res){
-    //takes new scores to compare with existing people in array
-    var newScore = req.body.scores;
-    var scoreArray = [];
-    var friendCount = 0;
-    var bestMatch = 0;
+// Export API routes
+module.exports = function(app) {
+	
 
-    //goes through all friends in list
-    for(var i = 0; i < friendList.length; i++){
-      var scoreDiff = 0;
-      //goes through scores to compare friends
-      for(var j = 0; j < newScore.length; j++){
-        scoreDiff += (Math.abs(parseInt(friendList[i].scores[j]) - parseInt(newScore[j])));
-      }
+	// Total list of friend entries
+	app.get('/api/friends', function(req, res) {
+		res.json(friends);
+	});
 
-      //push results into scoresArray
-      scoreArray.push(scoreDiff);
-    }
+	// Add new entry
+	app.post('/api/friends', function(req, res) {
+		// Capture the user input
+		var userInput = req.body;
 
-    // find best match after score comparison
-    for(var i=0; i<scoresArray.length; i++){
-      if(scoreArray[i] <= scoreArray[bestMatch]){
-        bestMatch = i;
-      }
-    }
+		var userResponses = userInput.scores;
+		
 
-    //return data
-    var bff = friendArray[bestMatch];
-    res.json(bff);
+		// Calculate best match
+		var matchName = '';
+		var matchImage = '';
+		var totalDifference = 1000; 
 
-    //pushes new submission into the friendsList array
-    friendArray.push(req.body);
-  });
+		// Go through all existing friends in the list
+		for (var i = 0; i < friends.length; i++) {
+			// console.log('friend = ' + JSON.stringify(friends[i]));
+
+			// Calculate differenes for each question
+			var diff = 0;
+			for (var j = 0; j < userResponses.length; j++) {
+				diff += Math.abs(friends[i].scores[j] - userResponses[j]);
+			}
+
+			// If lowest difference, record the friend match
+			if (diff < totalDifference) {
+
+				totalDifference = diff;
+				matchName = friends[i].name;
+				matchImage = friends[i].photo;
+			}
+		}
+
+		// Add new user
+		friends.push(userInput);
+
+		// Send appropriate response
+		res.json({status: 'OK', matchName: matchName, matchImage: matchImage});
+	});
 };
